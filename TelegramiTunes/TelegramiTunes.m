@@ -68,6 +68,7 @@ static void override_sendMessage(id self, SEL _cmd, NSString *message,
           selector:@selector(updateTrackInfo:)
               name:@"com.apple.iTunes.playerInfo"
             object:nil];
+  NSLog(@"TelegramiTunes loaded and set up!");
 }
 
 @end
