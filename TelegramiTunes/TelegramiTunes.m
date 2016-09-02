@@ -6,10 +6,10 @@
 #import <objc/runtime.h>
 
 static NSString *lastKnownTrack = nil;
-static void (*originalIMP)(id, SEL, NSString *, id, dispatch_block_t) = NULL;
+static void (*originalIMP)(id, SEL, NSString *, id, void *a, void *b, void *c) = NULL;
 
 static void override_sendMessage(id self, SEL _cmd, NSString *message,
-                                 id conversation, dispatch_block_t callback) {
+                                 id conversation, void *a, void *b, void *c) {
   if ([message rangeOfString:@"%_itunes" options:NSCaseInsensitiveSearch]
           .location != NSNotFound) {
     if (lastKnownTrack) {
@@ -21,7 +21,7 @@ static void override_sendMessage(id self, SEL _cmd, NSString *message,
     }
   }
 
-  originalIMP(self, _cmd, message, conversation, callback);
+  originalIMP(self, _cmd, message, conversation, a, b, c);
 }
 
 @interface TelegramiTunes : NSObject
@@ -47,15 +47,16 @@ static void override_sendMessage(id self, SEL _cmd, NSString *message,
   lastKnownTrack = [NSString stringWithFormat:@"%@ - %@", artist, name];
   [lastKnownTrack retain];
 }
+//- (void)sendMessage:(id)arg1 forConversation:(id)arg2 entities:(id)arg3 nowebpage:(BOOL)arg4 callback:(CDUnknownBlockType)arg5;
 
 + (void)load {
   Class targetClass = NSClassFromString(@"MessagesViewController");
   Method targetMethod = class_getInstanceMethod(
-      targetClass, @selector(sendMessage:forConversation:callback:));
+      targetClass, @selector(sendMessage:forConversation:entities:nowebpage:callback:));
   originalIMP = (void *)method_getImplementation(targetMethod);
 
   if (!class_addMethod(
-          targetClass, @selector(sendMessage:forConversation:callback:),
+          targetClass, @selector(sendMessage:forConversation:entities:nowebpage:callback:),
           (IMP)override_sendMessage, method_getTypeEncoding(targetMethod))) {
     method_setImplementation(targetMethod, (IMP)override_sendMessage);
   }

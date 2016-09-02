@@ -28,7 +28,7 @@
 			<key>BundleIdentifier</key>
 			<string>ru.keepcoder.Telegram</string>
 			<key>MaxBundleVersion</key>
-			<string>46701</string>
+			<string>9999999</string>
 			<key>MinBundleVersion</key>
 			<string>36666</string>
 		</dict>
